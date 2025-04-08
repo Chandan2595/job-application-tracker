@@ -80,6 +80,7 @@ def test_edit_job(client, mock_dynamodb_table):
     response = mock_dynamodb_table.get_item(Key={'JobID': '1234'})
     item = response.get('Item')
     assert item['Status'] == 'Interview'
+    
 
 def test_delete_job(client, mock_dynamodb_table):
     """Test the delete_job route."""
