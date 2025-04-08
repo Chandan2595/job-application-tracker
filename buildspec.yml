@@ -5,13 +5,12 @@ phases:
     runtime-versions:
       python: 3.11
     commands:
-      - pip install -r requirements.txt
+      - pip install bandit
   build:
     commands:
-      - echo "Running Static Code Analysis"
-      - bandit -r app.py || true
-      - echo "Zipping Deployment Package"
-      - zip -r deploy-package.zip .
+      - echo "Running Bandit Static Analysis"
+      - bandit -r . > bandit_report.txt || true
+
 artifacts:
   files:
-    - deploy-package.zip
+    - bandit_report.txt
