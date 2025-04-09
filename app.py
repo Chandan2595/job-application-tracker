@@ -8,7 +8,7 @@ from flask import Flask, request, render_template, redirect, send_from_directory
 import boto3
 from werkzeug.utils import secure_filename
 
-app = Flask(__name__)
+app = Flask(__name__) 
 
 # AWS DynamoDB Setup
 REGION = 'eu-west-1'
