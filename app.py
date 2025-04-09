@@ -1,15 +1,18 @@
-from flask import Flask, request, render_template, redirect, send_from_directory
-import boto3
+"""Flask application for managing job applications using AWS DynamoDB."""
+
+import os
 import uuid
 from datetime import datetime
-import os
+
+from flask import Flask, request, render_template, redirect, send_from_directory
+import boto3
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
 # AWS DynamoDB Setup
-region = 'eu-west-1'
-dynamodb = boto3.resource('dynamodb', region_name=region)
+REGION = 'eu-west-1'
+dynamodb = boto3.resource('dynamodb', region_name=REGION)
 table = dynamodb.Table('JobApplications')
 
 # File Upload Setup
@@ -20,17 +23,19 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
+
 @app.route('/')
 def index():
-    # Fetch all job entries from DynamoDB
+    """Render the home page with job application list."""
     response = table.scan()
     jobs = response.get('Items', [])
-    # Sort by date (latest first) if DateApplied exists
     jobs.sort(key=lambda x: x.get('DateApplied', ''), reverse=True)
     return render_template('index.html', jobs=jobs)
 
+
 @app.route('/add', methods=['POST'])
 def add_job():
+    """Handle new job application submission."""
     company = request.form['company']
     role = request.form['role']
     status = request.form['status']
@@ -43,7 +48,7 @@ def add_job():
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(file_path)
 
-    file_url = f"/uploads/{filename}"  # Flask route
+    file_url = f"/uploads/{filename}"
 
     # Insert into DynamoDB
     table.put_item(Item={
@@ -57,12 +62,16 @@ def add_job():
 
     return redirect('/')
 
+
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
+    """Serve uploaded resume files."""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
 
 @app.route('/edit/<job_id>', methods=['POST'])
 def edit_job(job_id):
+    """Edit job application status."""
     new_status = request.form['status']
     table.update_item(
         Key={'JobID': job_id},
@@ -72,10 +81,13 @@ def edit_job(job_id):
     )
     return redirect('/')
 
+
 @app.route('/delete/<job_id>', methods=['POST'])
 def delete_job(job_id):
+    """Delete a job application."""
     table.delete_item(Key={'JobID': job_id})
     return redirect('/')
+
 
 if __name__ == '__main__':
     # Run with dynamic port for Elastic Beanstalk
