@@ -1,0 +1,25 @@
+version: 0.2
+
+env:
+  variables:
+    SONAR_SCANNER_VERSION: 5.0.1.3006
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.9
+    commands:
+      - echo "📥 Installing dependencies and SonarScanner..."
+      - pip install --upgrade pip
+      - pip install -r requirements.txt
+      - curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip
+      - unzip sonar-scanner.zip
+  build:
+    commands:
+      - echo "🔍 Running SonarCloud analysis..."
+      - |
+        ./sonar-scanner-${SONAR_SCANNER_VERSION}-linux/bin/sonar-scanner \
+          -Dsonar.login=$SONAR_TOKEN \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.projectKey=Chandan2595_job-application-tracker \
+          -Dsonar.organization=chandan2595
