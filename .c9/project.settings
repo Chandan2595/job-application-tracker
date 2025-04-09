@@ -1,6 +1,6 @@
 {
     "extensions": {
-        "@aws.samcli.lambdaTimeout": 91234,
+        "@aws.samcli.lambdaTimeout": 90000,
         "@editor.acceptSuggestionOnEnter": "on",
         "@editor.snippetSuggestions": "top",
         "@editor.suggest.preview": true,
